@@ -13,7 +13,9 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
+console.log('--------------- checking dotenv -------------');
 require('dotenv').config({silent: true, path: 'local.env'});
+console.log('--------------- getting VCAP_SERVICES -------------');
 var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
 
 app.use(session({
