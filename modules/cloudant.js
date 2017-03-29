@@ -9,9 +9,9 @@ var Cloudant = require("cloudant");
 
 module.exports = function(app) {
 
-//	var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
+	var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
 	console.log('cloudant: typeof vcap is ', typeof process.env.VCAP_SERVICES); 
-	
+	console.dir(vcap_services);
 //	console.log('cloudant id is ', vcap_services.cloudantNoSQLDB[0].credentials.username);
 //	var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
 //	var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
