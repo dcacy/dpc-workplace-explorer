@@ -33,6 +33,11 @@ if (process && process.env && process.env.VCAP_SERVICES) {
 	console.log('no vcap services');
 }
 
+app.get('/vcap', function(req,res) {
+	console.log('in getvcap');
+  res.setHeader('Content-Type','application/json');
+	res.end(JSON.stringify(process.env.VCAP_SERVICES));
+});
 
 // start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
