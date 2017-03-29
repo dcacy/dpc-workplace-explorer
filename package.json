@@ -1,0 +1,22 @@
+{
+  "name": "dpc-workspace-explorer",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "cfenv": "^1.0.4",
+    "cookies": "^0.7.0",
+    "express": "^4.15.2",
+    "https": "^1.0.0",
+    "promise": "^7.1.1",
+    "properties-reader": "0.0.15",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
+  },
+  "repository": {},
+  "engines": {
+    "node": "4.x"
+  }
+}
