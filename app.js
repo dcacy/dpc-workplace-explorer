@@ -13,6 +13,8 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
+console.log('process env is');
+console.dir(process.env);
 console.log('--------------- checking dotenv -------------');
 require('dotenv').config({silent: true, path: 'local.env'});
 console.log('--------------- getting VCAP_SERVICES -------------');
@@ -48,8 +50,8 @@ console.dir(process.env.VCAP_APPLICATION);
 //});
 //console.log('vcap:', process.env.VCAP_SERVICES);
 
-var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
-var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
+//var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
+//var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
 
 // start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
