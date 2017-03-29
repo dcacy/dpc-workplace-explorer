@@ -20,7 +20,7 @@ var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
 
 app.use(session({
   cookieName: 'session',
-  secret: 'here-is-a-secrete',
+  secret: 'here-is-a-secret',
   duration: 30 * 60 * 1000,
   activeDuration: 30 * 60 * 1000,
 }));
