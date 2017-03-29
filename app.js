@@ -17,6 +17,8 @@ console.log('--------------- checking dotenv -------------');
 require('dotenv').config({silent: true, path: 'local.env'});
 console.log('--------------- getting VCAP_SERVICES -------------');
 var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
+console.log('in app and vcap_services is:');
+console.dir(vcap_services);
 
 app.use(session({
   cookieName: 'session',

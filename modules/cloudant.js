@@ -18,9 +18,9 @@ module.exports = function(app) {
 //	var cloudant = Cloudant({account: CLOUDANT_USER, password: CLOUDANT_PW});
 //	console.log('cloudant is ', cloudant);
 	
-	cloudant.db.list(function(err, allDbs) {
-    console.log('Checking cloudant by listing all my databases: %s', allDbs.join(', '));
-});
+//	cloudant.db.list(function(err, allDbs) {
+//    console.log('Checking cloudant by listing all my databases: %s', allDbs.join(', '));
+//});
 //	function getCloudant() {
 //		console.log('in getCloudant');
 //		console.log('cloudant id is ', process.CLOUDANT_USER = bluemix_env.cloudantNoSQLDB[0].credentials.username;
