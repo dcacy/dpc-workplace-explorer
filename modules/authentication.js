@@ -2,7 +2,7 @@
 
 var https = require('https');
 var PropertiesReader = require('properties-reader');
-var properties = PropertiesReader('./workspace.properties');
+//var properties = PropertiesReader('./workspace.properties');
 var Promise = require('promise');
 var request = require('request');
 var rp = require('request-promise');
@@ -12,82 +12,29 @@ module.exports = function(app) {
 
 	function getToken() {
 		console.log('in method getToken');
+		console.log('app id is ', process.env.WORKSPACE_APP_ID);
 		return new Promise(function(resolve, reject){
 			var options = {
-			    hostname: 'api.watsonwork.ibm.com',
 			    method: 'POST',
-			    path: '/oauth/token',
-			    headers: {
-			      "Content-Type" : "application/x-www-form-urlencoded"
+			    uri: 'https://api.watsonwork.ibm.com/oauth/token',
+			    auth: {
+			    	user: process.env.WORKSPACE_APP_ID,
+			    	pass: process.env.WORKSPACE_APP_SECRET
 			    },
-			    auth: properties.get('app_id') + ':' + properties.get('app_secret')
+			    form: {
+			        'grant_type': 'client_credentials'
+			    }
 			};
-			var result = '';
-		  var request = https.request(options, function(response) {
-		    console.log('made call to token; status is ', response.statusCode);
-		    try {
-		      response.on('data', function(chunk) {
-		      	result += chunk;
-		      });
-		      response.on('end', function() {
-		    	  console.log('got results from token');
-//		    	  var tokenResponse;
-//		    	  console.log(response);
-		    	  resolve(result);
-		      });
-		    } catch (e) { console.log(e); }
-		  }).on('error', function(e) { 
-		  	console.log ("got error getting token ", e); 
-		  	reject(e);
-		  	});
-	    request.write('grant_type=client_credentials');
-	    request.end(result);
+			rp(options)
+	    .then(function (token) {
+	        console.log('call to token worked and result is ', token);
+	        resolve(token);
+	    })
+	    .catch(function (err) {
+	        console.log('call to token failed: ', err.statusCode, err.message);
+	        reject(err);
+	    });
 		});
-//		return new Promise(function(resolve, reject) {
-//      var req = https.get(url, function(res) {
-//        var data = "";
-//        res.on('data', function (chunk) {
-//            data += chunk;
-//        });
-//        res.on('end', function() {
-//            // resolve with the data returned by the Alchemy API
-//            // do it this way so that the promise infrastructure will order it for us
-//            resolve(data);
-//        });
-//    });
-//    req.on('error', function (e) {
-//        console.error(e);
-//        reject(e);
-//    });
-//    req.end();
-//}));
-//		var options = {
-//		    hostname: 'api.watsonwork.ibm.com',
-//		    method: 'POST',
-//		    path: '/oauth/token',
-//		    headers: {
-//		      "Content-Type" : "application/x-www-form-urlencoded"
-//		    },
-//		    auth: properties.get('app_id') + ':' + properties.get('app_secret')
-//		};
-		
-//		var result = '';
-//	  var request = https.request(options, function(response) {
-//	    console.log('made call to token; status is ', response.statusCode);
-//	    try {
-//	      response.on('data', function(chunk) {
-//	      	result += chunk;
-//	      });
-//	      response.on('end', function() {
-//	    	  console.log('got results from token');
-//	    	  var tokenResponse;
-////	    	  console.log(response);
-//	    	  callback(result);
-//	      });
-//	    } catch (e) { console.log(e); }
-//	  }).on('error', function(e) { console.log ("got error, "); });
-//    request.write('grant_type=client_credentials');
-//    request.end(result);
 	}
 	
 	
@@ -120,10 +67,9 @@ module.exports = function(app) {
 		        console.log('graphql failed');
 		        reject(err);
 		    });
-//				resolve(token);
 			},
 			function(err){
-			console.log('error: ', err);			
+			console.log('error: ', err.statusCode, err.message);			
 			reject(err);
 			});			
 		});
@@ -137,6 +83,9 @@ module.exports = function(app) {
   		console.log('in getSpaces.then');
   	  var json = result;//JSON.parse(result);
   	  var expires_in = json.expires_in;
+  	  console.log('expires: ', json.expires_in);
+  	  console.log('session is', req.session);
+  	  req.session.expires_in = 'howdy';
   		console.log('called getToken and result is ', json);
       res.setHeader('Content-Type','application/json');
 //      var cookies = new Cookies(req, res);
@@ -144,9 +93,9 @@ module.exports = function(app) {
   		res.end(JSON.stringify(result.data.spaces.items));
   	},
   	function(err){
-  		console.log('error!', err);
+  		console.log('error!', err.statusCode, err.message);
       res.setHeader('Content-Type','application/json');
-  		res.end(JSON.stringify(err));
+  		res.end(JSON.stringify(err.message));
   	});
   });
 

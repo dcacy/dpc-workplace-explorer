@@ -5,9 +5,13 @@
   "scripts": {
     "start": "node app.js"
   },
+  "author": "Darren Cacy",
   "dependencies": {
     "cfenv": "^1.0.4",
+    "client-sessions": "^0.7.0",
+    "cloudant": "^1.7.1",
     "cookies": "^0.7.0",
+    "dotenv": "^4.0.0",
     "express": "^4.15.2",
     "https": "^1.0.0",
     "promise": "^7.1.1",

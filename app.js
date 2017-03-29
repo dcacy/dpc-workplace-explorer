@@ -2,6 +2,7 @@
 
 var express = require('express'),
   cfenv = require('cfenv');
+var session = require('client-sessions');
 
 // create a new express server
 var app = express();
@@ -12,32 +13,39 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
+require('dotenv').config({silent: true, path: 'local.env'});
+var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
+
+app.use(session({
+  cookieName: 'session',
+  secret: 'here-is-a-secrete',
+  duration: 30 * 60 * 1000,
+  activeDuration: 30 * 60 * 1000,
+}));
+
 //var https = require('https');
-//var authentication = require('./modules/authentication');
+var authentication = require('./modules/authentication');
+var cloudant = require('./modules/cloudant');
 //var spaces = require('./modules/spaces');
 
-//authentication(app);
+authentication(app);
+cloudant(app);
 //spaces(app);
 
-//app.get('/getToken', function(req,res) {
-//	console.log('in getToken');
+console.log('VCAP_APPLICATION');
+console.dir(process.env.VCAP_APPLICATION);
+//app.get('/vcap', function(req,res) {
+//	console.log('in vcap');
+//	console.log('type of vcap is ', typeof process.env.VCAP_SERVICES);
 ////	getToken(function(result) {
 ////		console.log('called getToken and result is ', result);
-//		res.end('done');
+//		res.end(process.env.VCAP_SERVICES);
 ////	});
 //});
+//console.log('vcap:', process.env.VCAP_SERVICES);
 
-if (process && process.env && process.env.VCAP_SERVICES) {
-	console.log('vcap services: ', process.env.VCAP_SERVICES);
-} else {
-	console.log('no vcap services');
-}
-
-app.get('/vcap', function(req,res) {
-	console.log('in getvcap');
-  res.setHeader('Content-Type','application/json');
-	res.end(JSON.stringify(process.env.VCAP_SERVICES));
-});
+var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
+var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
 
 // start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
