@@ -13,8 +13,8 @@ app.use(express.static(__dirname + '/public'));
 var appEnv = cfenv.getAppEnv();
 
 //var https = require('https');
-var authentication = require('./modules/authentication');
-var spaces = require('./modules/spaces');
+//var authentication = require('./modules/authentication');
+//var spaces = require('./modules/spaces');
 
 //authentication(app);
 //spaces(app);
