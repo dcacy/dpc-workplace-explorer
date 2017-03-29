@@ -16,8 +16,8 @@ var appEnv = cfenv.getAppEnv();
 var authentication = require('./modules/authentication');
 var spaces = require('./modules/spaces');
 
-authentication(app);
-spaces(app);
+//authentication(app);
+//spaces(app);
 
 //app.get('/getToken', function(req,res) {
 //	console.log('in getToken');
