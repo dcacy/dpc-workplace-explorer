@@ -1,11 +1,17 @@
 'use strict';
 
-var https = require('https');
+
+
+module.exports = function(app) {
+
+	var https = require('https');
 //var PropertiesReader = require('properties-reader');
 //var properties = PropertiesReader('./workspace.properties');
 var Promise = require('promise');
 var request = require('request');
 var rp = require('request-promise');
+//var session = require('client-sessions');
+
 
 const WWS_URL = "https://api.watsonwork.ibm.com";
 const WWS_CLIENT_URL = "https://workspace.ibm.com";
@@ -18,24 +24,30 @@ const APP_ID = process.env.WORKSPACE_APP_ID;
 const APP_SECRET = process.env.WORKSPACE_APP_SECRET;
 
 const vcap_application = JSON.parse(process.env.VCAP_APPLICATION);
-console.log('vcap_application');
-console.dir(vcap_application); 
+//console.log('vcap_application');
+//console.dir(vcap_application); 
 const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 
-
-module.exports = function(app) {
-
+//app.use(session({
+//  cookieName: 'session',
+//  secret: 'here-is-a-secret',
+////  duration: 30 * 60 * 1000,
+////  activeDuration: 5 * 60 * 1000
+//}));
+	
 	app.get('/oauth', function(req,res) {
-  	console.log('in oauth and session id is ', req.session.id);
+  	console.log('in oauth and session  is ', req.session);
   	console.log('appid is ', APP_ID,' and hsotname is', APP_HOSTNAME);
-    res.redirect(WWS_CLIENT_URL 
-    		+ OAUTH_ENDPOINT 
-    		+ "?response_type=code&client_id=" 
-    		+ APP_ID 
-    		+ "&redirect_uri=" 
-    		+ APP_HOSTNAME 
-    		+ "/oauthback&state=" 
-    		+ req.session.id);
+  	var redirectURL = WWS_CLIENT_URL
+			+ OAUTH_ENDPOINT 
+			+ "?response_type=code&client_id=" 
+			+ APP_ID 
+			+ "&redirect_uri=" 
+			+ APP_HOSTNAME 
+			+ "/oauthback&state=" 
+			+ req.session.id;
+  	console.log('redirectURL:', redirectURL);
+    res.redirect(redirectURL);
   	
   	
   });

@@ -2,7 +2,8 @@
 
 var express = require('express'),
   cfenv = require('cfenv');
-var session = require('client-sessions');
+//var session = require('client-sessions');
+var session = require('express-session');
 
 // create a new express server
 var app = express();
@@ -13,21 +14,29 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
-console.log('process env is');
-console.dir(process.env);
+//console.log('process env is');
+//console.dir(process.env);
 console.log('--------------- checking dotenv -------------');
 require('dotenv').config({silent: true, path: 'local.env'});
 console.log('--------------- getting VCAP_SERVICES -------------');
 var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
-console.log('in app and vcap_services is:');
-console.dir(vcap_services);
+//console.log('in app and vcap_services is:');
+//console.dir(vcap_services);
 
 app.use(session({
-  cookieName: 'session',
-  secret: 'here-is-a-secret',
-  duration: 30 * 60 * 1000,
-  activeDuration: 30 * 60 * 1000,
+  resave: true,
+  saveUninitialized: true,
+  secret: 'shh-its-a-secret',
+  cookie: {
+      maxAge: 1000 * 60 * 60
+  }
 }));
+//app.use(session({
+//  cookieName: 'session',
+//  secret: 'here-is-a-secret',
+////  duration: 30 * 60 * 1000,
+////  activeDuration: 5 * 60 * 1000
+//}));
 
 //var https = require('https');
 var authentication = require('./modules/authentication');
@@ -35,19 +44,24 @@ var cloudant = require('./modules/cloudant');
 //var spaces = require('./modules/spaces');
 
 authentication(app);
-cloudant(app);
+//cloudant(app);
 //spaces(app);
 
-console.log('VCAP_APPLICATION');
-console.dir(process.env.VCAP_APPLICATION);
-//app.get('/vcap', function(req,res) {
-//	console.log('in vcap');
-//	console.log('type of vcap is ', typeof process.env.VCAP_SERVICES);
-////	getToken(function(result) {
-////		console.log('called getToken and result is ', result);
-//		res.end(process.env.VCAP_SERVICES);
-////	});
-//});
+//console.log('VCAP_APPLICATION');
+//console.dir(process.env.VCAP_APPLICATION);
+app.get('/session', function(req,res) {
+	if ( req.session.user ) {
+		console.log(req.session);
+		res.end('you are user ' + req.session.user);
+	} else {
+	req.session.user = 'foo';
+	console.log('in session and session is');
+	console.log(req.session);
+	console.log('id is', req.session.id);
+res.end('done');
+	}
+//	});
+});
 //console.log('vcap:', process.env.VCAP_SERVICES);
 
 //var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
