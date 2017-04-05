@@ -73,25 +73,30 @@ res.end('done');
 
 //var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
 //var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
-
+console.log('local is', process.env.LOCAL);
+if (process.env.LOCAL ) {
+	console.log('running LOCAL');
 //start for SSL
-//var fs = require('fs');
-//var sslPath = '/Users/skipper/letsencrypt/live/blogwoods.net/';
-//var options = {  
-//    key: fs.readFileSync(sslPath + 'privkey.pem'),
-//    cert: fs.readFileSync(sslPath + 'fullchain.pem')
-//};
-//var https = require('https');
-//https.createServer(options, app).listen(appEnv.port, '0.0.0.0', function() {
-//	console.log('server starting on ', appEnv.url);
-//});
-// end for SSL
+	var fs = require('fs');
+	var sslPath = '/Users/skipper/letsencrypt/live/blogwoods.net/';
+	var options = {  
+	    key: fs.readFileSync(sslPath + 'privkey.pem'),
+	    cert: fs.readFileSync(sslPath + 'fullchain.pem')
+	};
+	var https = require('https');
+	https.createServer(options, app).listen(appEnv.port, '0.0.0.0', function() {
+		console.log('local server starting on', appEnv.url);
+	});
+	// end for SSL	
+} else {
+	console.log('running on bluemix');
+	//start server on the specified port and binding host
+	app.listen(appEnv.port, '0.0.0.0', function() {
+	  console.log("server starting on " + appEnv.url);
+	});
+}
 
 
-// start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-  console.log("server starting on " + appEnv.url);
-});
 // appid 3b7bc12c-da5d-46d3-a7e1-51c7e8b6295d
 // app secret nsn6tep1ixsp3ss681c2huol2ryvkyaa
 

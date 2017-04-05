@@ -96,7 +96,7 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 		  + '    }'
 		  + '  }'
 		  + '  conversation {'
-		  + '    messages(first: 10) {'
+		  + '    messages(first: 200) {'
 		  + '      pageInfo {'
 		  + '        startCursor'
 		  + '        endCursor'

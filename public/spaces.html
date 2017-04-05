@@ -52,8 +52,11 @@
 	   <div>
 	   	<div style="float:left;width:50%;">
 			<div id="messagesTableHeader" class="tableHeader" style="display:none;">Messages</div>
+				<div id="pleaseWait"></div>
+				<div id="messagesTableWrapper">
 				<table id="messagesTableDataTable" style="width:100%;" class="table compact stripe hover" >
 				</table>
+				</div>
 				<div id="PrevNext" class="PrevNext" style="float:right;">
 					<img onclick="previousMessages()" id="PreviousButton" src="/img/arrow--left.svg" style="display:none;padding-right:10px;">
 					<img onclick="nextMessages()" id="NextButton" src="/img/arrow--right.svg" style="display:none;">
@@ -61,7 +64,11 @@
 			</div>
 			
 			<!-- annotations for the selected message -->
-			<div style="float:right;width:49%;background-color:#ccddee;" id="messageWrapper"></div>
+			<div style="float:right;width:49%;" id="messageWrapper">
+				<div>Sentiment: <span id="sentiment"></span></div>
+				<div>Keywords: <span id="keywords"></span></div>
+				<div id="annotations"></div>
+			</div>
 		</div>
 		</div>
 		</div>
@@ -73,6 +80,7 @@
 		<script type="text/javascript" src="js/jquery.tinydot.min.js"></script>
 		<script type="text/javascript" src="js/jquery.loadmask.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/date.format.js"></script>
 		<script type="text/javascript" src="js/spaces.js"></script>
 	</body>
 </html>

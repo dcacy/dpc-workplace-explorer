@@ -5,10 +5,15 @@ function start() {
 //	$('#spaceWrapper').hide();
 //	$('#messagesTableDataTable_wrapper').remove();
 //	$('#spaceInfoTable').hide();
-//	$('#messageWrapper').hide();
+	$('#messageWrapper').hide();
 //	$('#messagesTableHeader').hide();
 //	$('#PrevNext').hide();
 //	$('#spacesTableWrapper').show();
+	if ( $.fn.dataTable.isDataTable( '#messagesTableDataTable' ) ) {
+		console.log('found messagesTableDataTable, destroying it');
+    $('#messagesTableDataTable').DataTable().clear();
+	}
+//	$('#messagesTableDataTable_wrapper').remove();
   
   if ( spaceData ) {
   	console.log('found spaceData so just showing spaces');
@@ -22,6 +27,7 @@ function start() {
 			console.log('an error occurred getting spaces:', err);
 			$('#error').html(err.responseText);
 			$('#loginMessage').show();
+			$('#spacesTableWrapper').hide();
 		}).
 		always(function() {
 			$('#spacesTable').unmask();
@@ -46,6 +52,7 @@ function formatSpacesTable(data) {
     paging: false,
     searching: false,
     info: false,
+    autoWidth: false,
 //    responsive: true,
     order: [[ 1, 'desc' ]],
     columns: [
@@ -59,12 +66,22 @@ function formatSpacesTable(data) {
     columnDefs: [
     	{ "className" : "spaceTableText", "targets": "_all"},
       { "title": "Name", "targets": 0 },
-      { "title": "Last Updated", "targets": 1 }
+      { "title": "Last Updated", "targets": 1, render: function(data, type) {
+      		// if type is display or filter, then format the date
+      		if ( type === 'display' || type === 'filter') {
+      			return dateFormat(new Date(data), 'dd mmm yyyy h:MM:sstt');
+      		} else {
+      			// otherwise it must be for sorting so return the raw value
+      			return data;
+      		}
+      	}
+      }
     ]
   });
 	
+	// do this when user clicks on a space in the spaces table
 	$('#spacesTable tbody').on('click', 'td.spaceTableName', function () {
-		console.log('in onclick of spacesTable');
+//		console.log('in onclick of spacesTable');
     var tr = $(this).closest('tr');
     var row = table.row( tr );
 //    console.log('row is ', row);
@@ -74,14 +91,14 @@ function formatSpacesTable(data) {
     
     $('#spacesTableWrapper').hide();
     $('#spaceWrapper').show();
-    $('#messagesTableDataTable').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
+    $('#pleaseWait').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
     $.get('/getSpaceDetails', { id : row.data().id}, processSpaceDetails, 'json')
     .fail(function(err) {
   		console.log('an error occurred:', err);
   		$('#error').html(err.responseText);
   	}).
   	always(function(){
- 		  $('#messagesTableDataTable').unmask();
+ 		  $('#pleaseWait').unmask();
  		  $('#navBar').show();
  		  $('#spaceInfoTable').show();
  		  $('#messagesTableHeader').show();
@@ -113,43 +130,70 @@ function processSpaceDetails(json) {
 	}
 	var messagesTable = $('#messagesTableDataTable').DataTable( {
     data: json.conversation.messages.items,
-    paging: false,
+//    paging: false,
     searching: false,
     info: false,
 //    responsive: true,
-    order: [[ 1, 'desc' ]],
+    order: [[ 2, 'desc' ]],
     columns: [
         /*{
             "className": 'details-control',
             "defaultContent": ''
         },*/
-        { "data": "content" },
+        { "data": "content", "render": function(data) {
+        	// formatting at-mentions
+        	if ( data ) {
+        		if ( data.includes('<@') ){
+        			var stillLooking = true;
+        			while (stillLooking){
+        				if (data.indexOf('<@') == -1 ) {
+        					stillLooking = false;
+        				} else {
+        				var atMention = data.substring(data.indexOf('<@'),data.indexOf('>',data.indexOf('<@'))+1);
+//        				console.log('atMention is', atMention);
+        				var splitData = data.split(atMention);
+//        				console.log(splitData);
+        				var name = atMention.split('|')[1].replace('>','');
+//        				console.log('name is', name);
+        				data = splitData[0] + '<strong>@' + name + '</strong>' + splitData[1];
+//        				console.log('now data is', data);
+        				}
+        			}
+        		}
+        	}
+        	return data;
+        }},
         { "data": "createdBy.displayName", "className": "dpcTooltip" },
         { "data": "created"}
     ],
     columnDefs: [
     	{ "className" : "messageContent", "targets": "_all"},
-      { "title": "Name", "targets": 0 },
+      { "title": "Message", "targets": 0 },
       { "title": "Author", "targets": 1 },
-      { "title": "When Created", "targets": 2 }
+      { "title": "When Created", "targets": 2, render: function(data, type) {
+      		// if type is display or filter then format the date
+      		if ( type === 'display' || type === 'filter') {
+      			return dateFormat(new Date(data), 'dd mmm yyyy h:MM:sstt');
+      		} else {
+      			// otherwise it must be for sorting so return the raw value
+      			return data;
+      		}    			
+      	} 
+      }
     ],
     "fnCreatedRow": function( nRow, aData, iDataIndex ) {
-//    	console.log('in fnCreatedRow');
-//    	console.log(nRow);
-//    	console.log(nRow.getElementsByTagName('td')[0]);//Attribute('role'));
     	// create an attribute for the message ID so we can retrieve it later when we click on this message
     	nRow.getElementsByTagName('td')[0].setAttribute('message-id', aData.id); 
-//    	console.log(aData);
-//    	console.log(iDataIndex);
     }
   });
 	
+	//use DataTable's 'on' event handler because the jQuery one doesn't work with paging
+	messagesTable.on('click', 'td', function(){  
+		
+		// highlight chosen message
+		$('.messageContent').toggleClass('chosenMessage',false);
+		$(this).toggleClass('chosenMessage');
 
-	
-	$('.messageContent').on('click', this, function () {
-//		console.log('click');
-//		console.log(this);
-//		console.log(this.getAttribute('message-id'));
 		$('#tabs').remove();
 
 		$('#messageWrapper').show();
@@ -173,30 +217,74 @@ function processSpaceDetails(json) {
 //		console.log('annotation is', annotation);
 //		console.log('pretty:', JSON.stringify(annotation,null,2));
 //		document.getElementById('messageWrapper').innerHTML = JSON.stringify(annotation,null,2);
-		var annotationsText = '<div id="tabs"><ul>';
-		for (var i = 0; i < json.annotations.length; i++ ) {
-			annotationsText += '<li><a href="#tabs-' + (i + 1) + '">Annotation ' + (i + 1) + '</a></li>';
-		}
-		annotationsText += "</ul>";
+//		var annotationsText = '<div id="tabs"><ul>';
+		var annotationsHeader = '';
+//		for (var i = 0; i < json.annotations.length; i++ ) {
+//		}
+//		annotationsText += "</ul>";
+		var sentiment = 'n/a';
+		var concepts = [];
+		var annotationsBody = '';
 		for (var j = 0; j < json.annotations.length; j++ ) {
-			annotationsText += '<div id="tabs-' + (j + 1) + '">';
-			console.log('annotation:', json.annotations[j]);
-			console.log('type is ', typeof json.annotations[j]);
+			annotationsHeader += '<li><a href="#tabs-' + (j + 1) + '">Annotation ' + (j + 1) + '</a></li>';
+			annotationsBody += '<div id="tabs-' + (j + 1) + '">';
+//			console.log('annotation:', json.annotations[j]);
+//			console.log('type is ', typeof json.annotations[j]);
 			
-			var tmp = JSON.parse(json.annotations[j]);
-			console.log('tmp:', tmp);
+			var annotationJSON = JSON.parse(json.annotations[j]);
+			// payload and context are stringified JSON, so convert to JSON
+			if ( annotationJSON.payload ) {
+//				console.log('found payload and type is', typeof annotationJSON.payload);
+				var payload = JSON.parse(annotationJSON.payload);
+				annotationJSON.payload = payload;
+			}
+			if ( annotationJSON.context ) {
+//				console.log('found context and type is', typeof annotationJSON.context);
+				var context = JSON.parse(annotationJSON.context);
+				annotationJSON.context = context;
+			}
+//			console.log('tmp:', annotationJSON);
+			if ( annotationJSON.docSentiment ) {
+				sentiment = annotationJSON.docSentiment.type;
+//				console.log('sentiment is ', sentiment);
+			}
+			if ( annotationJSON.concepts ) {
+				concepts.push(annotationJSON.concepts);
+			}
 //			tmp = tmp.split("\\\"").join("\"");
 //			console.log('tmp2:', tmp);
 //			var jsontmp = JSON.parse(tmp);
 //			annotationsText += JSON.stringify(jsontmp, null, 2);
 //			tmp = syntaxHighlight(tmp);
-			annotationsText += '<pre>' + syntaxHighlight(JSON.stringify(tmp, undefined, 2)) + '</pre>';
-			annotationsText += '</div>';
+			annotationsBody += '<pre>' + syntaxHighlight(JSON.stringify(annotationJSON, undefined, 2)) + '</pre>';
+			annotationsBody += '</div>';
 		}
-		annotationsText += '</div>';
+//		console.log(concepts);
+		var conceptsString = [];
+		if (concepts.length > 0 ) {
+			for (var i = 0; i < concepts.length; i++ ) {
+				for ( var j = 0; j < concepts[i].length; j++ ) {
+					
+				
+//				console.dir(concepts[i][j]);
+				if ( concepts[i][j].relevance > .8) {
+				conceptsString.push(concepts[i][j].text);
+				}
+				}
+			}
+		}
+		console.log('concepts:', conceptsString);
+		document.getElementById('keywords').innerHTML = conceptsString.length > 0 ? conceptsString.toString().replace(/,/g,', ') : 'n/a';
+		document.getElementById('sentiment').innerHTML = sentiment;
+		var annotationsText = 
+			  '<div id="tabs"><ul>'
+			+ annotationsHeader
+			+ '</ul>'
+			+ annotationsBody
+			+ '</div>';
 //		$('#tabs').remove();
 //		$('#messageWrapper').html('');
-		$('#messageWrapper').html(annotationsText);
+		$('#annotations').html(annotationsText);
 //		for ( var k = 0; k < json.annotations.length; k++) {
 //			var pre = document.createElement('pre');
 //			pre.innerHTML = json.annotations[k];
