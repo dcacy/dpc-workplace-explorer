@@ -1,9 +1,22 @@
+var spaceData;
+
 function start() {
-	$('#spacesTable_wrapper').remove();
-	$('#messagesTableDataTable_wrapper').remove();
-	$('#spaceInfo').hide();
+//	$('#spacesTable_wrapper').remove();
+//	$('#spaceWrapper').hide();
+//	$('#messagesTableDataTable_wrapper').remove();
+//	$('#spaceInfoTable').hide();
+//	$('#messageWrapper').hide();
+//	$('#messagesTableHeader').hide();
+//	$('#PrevNext').hide();
+//	$('#spacesTableWrapper').show();
   $('#spacesTable').mask('<div align="center">Please Wait...<br/><img src="/img/watson.gif"></div>',200);
 
+  if ( spaceData ) {
+  	console.log('found spaceData so just showing spaces');
+  	$('#spacesTableWrapper').show();
+  	$('#spaceWrapper').hide();
+  } else {
+  	console.log('did not find space data so calling API');
 	$.get("/getSpaces", formatSpacesTable, 'json')
 	.fail(function(err) {
 		console.log('an error occurred getting spaces:', err);
@@ -13,12 +26,14 @@ function start() {
 	always(function() {
 		$('#spacesTable').unmask();
 	});
+  }
 
 }
 
 
 function formatSpacesTable(data) {
-	console.log('in formatSpacesTable');// and data is ', data);
+//	console.log('in formatSpacesTable');// and data is ', data);
+	spaceData = data;
 	if ( data.redirect ) {
 		window.location.href = data.redirect;
 	} else {
@@ -49,7 +64,7 @@ function formatSpacesTable(data) {
   });
 	
 	$('#spacesTable tbody').on('click', 'td.spaceTableName', function () {
-//		console.log('click');
+		console.log('in onclick of spacesTable');
     var tr = $(this).closest('tr');
     var row = table.row( tr );
 //    console.log('row is ', row);
@@ -58,16 +73,17 @@ function formatSpacesTable(data) {
 //    $('#spacesTableWrapper').innerHTML = '';//html();
     
     $('#spacesTableWrapper').hide();
+    $('#spaceWrapper').show();
     $('#messagesTableDataTable').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
     $.get('/getSpaceDetails', { id : row.data().id}, processSpaceDetails, 'json')
     .fail(function(err) {
   		console.log('an error occurred:', err);
-  		$('#spaces').html(err.responseText);
+  		$('#error').html(err.responseText);
   	}).
   	always(function(){
  		  $('#messagesTableDataTable').unmask();
  		  $('#navBar').show();
- 		  $('#spaceInfo').show();
+ 		  $('#spaceInfoTable').show();
  		  $('#messagesTableHeader').show();
 //		  $('#PreviousButton').show();
  		  $('#NextButton').show();
@@ -87,11 +103,14 @@ function processSpaceDetails(json) {
 	var nbrOfMembers = json.members.items.length == 200 ? '200+' : json.members.items.length;
 //	console.log('nbr of members', nbrOfMembers);
 //	console.log('nbr of messages', json.conversation.messages.items.length);
-	$('#spacesTableWrapper').html('');
+//	$('#spacesTableWrapper').html('');
 	$('#spaceName').html(json.title);
 	$('#membersCount').html(nbrOfMembers);	
 	$('#appsCount').html(apps.length);	
 	
+	if ( $.fn.dataTable.isDataTable( '#messagesTableDataTable' ) ) {
+    $('#messagesTableDataTable').DataTable().destroy();
+	}
 	var messagesTable = $('#messagesTableDataTable').DataTable( {
     data: json.conversation.messages.items,
     paging: false,
@@ -131,14 +150,17 @@ function processSpaceDetails(json) {
 //		console.log('click');
 //		console.log(this);
 //		console.log(this.getAttribute('message-id'));
-    $('#messageWrapper').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
+		$('#tabs').remove();
+
+		$('#messageWrapper').show();
+    $('#messageWrapper').mask('<div align="center" style="background-color:#fff;">Please Wait...<br/><img src="/img/watson.gif"></div>',200);
     // we set the message-id attribute earlier so that it would be here now
 		$.get('/getMessageDetails', { id : this.getAttribute('message-id')}, processMessageDetails, 'json')
 		.fail(function(err) {
 			console.log('an error occurred getting message details:', err);
 			$('#error').html(err.responseText);
 			$('#loginMessage').show();
-			$('#spaces').hide();
+			$('#appWrapper').hide();
 		}).
 		always(function() {
 			$('#messageWrapper').unmask();
@@ -172,7 +194,7 @@ function processSpaceDetails(json) {
 			annotationsText += '</div>';
 		}
 		annotationsText += '</div>';
-		$('#tabs').remove();
+//		$('#tabs').remove();
 //		$('#messageWrapper').html('');
 		$('#messageWrapper').html(annotationsText);
 //		for ( var k = 0; k < json.annotations.length; k++) {

@@ -13,7 +13,7 @@ body, table {
 }
 .tableHeader {
 	margin: 15px;
-    width: 50%;
+   // width: 50%;
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;
