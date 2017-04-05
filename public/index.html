@@ -1,7 +1,25 @@
 <html>
-<head>
-<title>DPC Workspace Explorer</title>
-</head>
-<body>
-Welcome to the Workspace Explorer! Please <a href="/oauth">log in</a>.
-</body></html>
+	<head>
+	<title>DPC Workspace Explorer</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/carbon-components.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="css/styles.css"></link>
+	</head>
+	<body>
+	Welcome to the Workspace Explorer! <br/> <button class="dpcButton" onclick="loginAndGetSpaces();">Log In</button>
+	
+
+		<div id="spaces"></div>	
+	<div id="spacesTableWrapper">
+	<table align="center" class="table compact stripe hover" id="spacesTable">
+      <!-- tbody will be inserted by JavaScript -->
+    </table>
+    </div>
+	
+	<script src="js/carbon-components.min.js"></script>
+	<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+	<script src="js/script.js"></script>
+	</body>
+</html>

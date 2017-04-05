@@ -26,7 +26,8 @@ const APP_SECRET = process.env.WORKSPACE_APP_SECRET;
 const vcap_application = JSON.parse(process.env.VCAP_APPLICATION);
 //console.log('vcap_application');
 //console.dir(vcap_application); 
-const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
+var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
+//APP_HOSTNAME = 'https://blogwoods.net:6012'; // testing
 
 //app.use(session({
 //  cookieName: 'session',
@@ -36,19 +37,23 @@ const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 //}));
 	
 	app.get('/oauth', function(req,res) {
-  	console.log('in oauth and session  is ', req.session);
-  	console.log('appid is ', APP_ID,' and hsotname is', APP_HOSTNAME);
-  	var redirectURL = WWS_CLIENT_URL
-			+ OAUTH_ENDPOINT 
-			+ "?response_type=code&client_id=" 
-			+ APP_ID 
-			+ "&redirect_uri=" 
-			+ APP_HOSTNAME 
-			+ "/oauthback&state=" 
-			+ req.session.id;
-  	console.log('redirectURL:', redirectURL);
-    res.redirect(redirectURL);
-  	
+//  	console.log('in oauth and session  is ', req.session);
+  	console.log('appid is ', APP_ID,' and hostname is', APP_HOSTNAME);
+  	console.log('mock is ', process.env.MOCK);
+  	if ( process.env.MOCK && process.env.MOCK == 'true' ) {
+  		res.end(process.env.MOCK_SPACES);
+  	} else {
+	  	var redirectURL = WWS_CLIENT_URL
+				+ OAUTH_ENDPOINT 
+				+ "?response_type=code&client_id=" 
+				+ APP_ID 
+				+ "&redirect_uri=" 
+				+ APP_HOSTNAME 
+				+ "/oauthback&state=" 
+				+ req.session.id;
+//	  	console.log('redirectURL:', redirectURL);
+	    res.end('{"redirect": "' + redirectURL + '"}');
+  	}
   	
   });
 	
@@ -76,10 +81,13 @@ const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 
     // Get the accessToken
     getAuthFromOAuthToken(APP_ID, APP_SECRET, code, redirect_uri, function(error, accessToken, refreshToken, userName, userid) {
+    	console.log('in callback from getAuthFromOAuthToken');
+//    	console.dir(req.session);
         // Add the userid & accesstoken to the session
         req.session.userid = userid;
         req.session.accessToken = accessToken;
-
+//        console.log('now session is');
+//        console.dir(req.session);
         // set userid in cookie
 //        setRememberMeCookie(res, userid);
 
@@ -118,9 +126,16 @@ const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 //        });
 
         console.log("We have an accessToken for %s.", userName);
-        console.log("Redirecting user to versetospaceui.html");
-//        res.redirect("/versetospaceui.html");
-        res.end('good');
+        console.log("Redirecting user to spaces.html");
+        res.redirect("/spaces.html");
+//        res.end('good' + accessToken);
+//        getSpaces2(accessToken)
+//        .then(function(result){
+//        	res.end(JSON.stringify(result));
+//        })
+//        .catch(function(err){
+//        	console.log('error in getting spaces:', err);
+//        });
     });
 });
 
@@ -140,11 +155,12 @@ const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
             "redirect_uri": redirect_uri
         }
     };
-
+//    console.log('auth options are', authenticationOptions);
     console.log("Issuing Authentication request with grant type 'authorization_code'");
 
     // Get the JWT Token
     request(authenticationOptions, function(err, response, authenticationBody) {
+//    	console.log('response from auth: ', response.statusCode, ' and ', response.message);
         // If successful authentication, a 200 response code is returned
         if (response.statusCode !== 200) {
             // if our app can't authenticate then it must have been
@@ -159,9 +175,74 @@ const APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
         const refreshToken = reqbody.refresh_token;
         const userName = reqbody.displayName;
         const userid = reqbody.id;
+        
+//        console.log('token is ', accessToken);
 
         callback(null, accessToken, refreshToken, userName, userid);
     });
+	}
+	
+	app.get('/getSpaces', function(req,res) {
+		console.log('in getSpaces');
+		var token = req.session.accessToken;
+//		token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiaWQiOiIzYjdiYzEyYy1kYTVkLTQ2ZDMtYTdlMS01MWM3ZThiNjI5NWQiLCJleHAiOjE0OTEyOTUwNDksImp0aSI6Ijk2M2Y0MjljLTkyZDItNGI0Ni04MjEwLWMxNTg5ZDExOWUzYiIsImNsaWVudF9pZCI6IjNiN2JjMTJjLWRhNWQtNDZkMy1hN2UxLTUxYzdlOGI2Mjk1ZCJ9.LBR93rVsWKLHbgPUWvP5nM0Cra5dW50p-g2fW1eUzD-hrvhRquS5YuE_1lnDTjl2XALhpyB0G9w4l9javgRI5qQnpB9ior97iPPvK6aghkyPqgTrQCzFUs_6DmpsMOUg7takrzNFilq6RWWTt3leHJyE5vG-vBvAlYTaU5NFfMsqrJX31aMKqLYrRNFaYQ_3HnH0Adga0n7tP2t5mJU6zm9Zk0NQ5ZswJjev3ibYhxRz3YV6xMptxNtOtlLS5BOoyIllgBW3aIswI9ddRkVpOSRZmBJIkJN3mVXyH2jYlPo8yUY-JcFld1Unummlb-JZbZ0pS_fD4ASzyixEWEhc3w";
+//	  console.log('token: <' + token + '> and type is ' + typeof token);
+	  if ( typeof token === 'undefined' || token == 'undefined' ) {
+	  	console.log('/getSpaces: no token');
+	  	res.status(400);
+	  	res.end('{"error":"Authentication token is not set.}');
+	  } else {
+		  getSpaces2(token)
+		  .then(function(result){
+		  	res.end(JSON.stringify(result));
+		  })
+		  .catch(function(err) {
+		  	console.log(err.status, err.message);
+		  	res.status(500);
+		  	res.end('{"error":"status = ' + err.status + ', message = ' + err.message);
+		  });
+	  }
+//		getSpaces2
+	});	
+	
+	function getSpaces2(token) {
+		console.log('in method getSpaces2');
+		return new Promise(function(resolve, reject){
+//			getToken().then(function(result) {
+//				console.log('token: ', result);
+//				var token = JSON.parse(result);
+//				var access_token = token.access_token;
+				console.log('getting Spaces');
+				var options = {
+				    method: 'POST',
+				    uri: 'https://api.watsonwork.ibm.com/graphql',
+				    headers: {
+				    	'Content-Type':'application/json',
+				    	'jwt': token
+				    },
+				    body: {
+				        query: 'query getSpaces { spaces(first: 20) {items {title id updated}}}'
+				    },
+				    json: true // Automatically stringifies the body to JSON
+				};
+				rp(options)
+		    .then(function (parsedBody) {
+		        console.log('graphql to get spaces succeeded ');
+//		        console.dir(parsedBody.data.spaces.items);
+		        resolve(parsedBody.data.spaces.items);
+		    })
+		    .catch(function (err) {
+		        console.log('graphql failed');
+		        reject(err);
+		    });
+//			},
+//			function(err){
+//			console.log('error: ', err.statusCode, err.message);			
+//			reject(err);
+//			});			
+		});
+
+
 	}
 	
 	function getToken() {

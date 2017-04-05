@@ -14,6 +14,11 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
+//console.dir(appEnv);
+
+
+
+
 //console.log('process env is');
 //console.dir(process.env);
 console.log('--------------- checking dotenv -------------');
@@ -41,11 +46,13 @@ app.use(session({
 //var https = require('https');
 var authentication = require('./modules/authentication');
 var cloudant = require('./modules/cloudant');
-//var spaces = require('./modules/spaces');
+var space = require('./modules/space');
+var message = require('./modules/message');
 
 authentication(app);
 //cloudant(app);
-//spaces(app);
+space(app);
+message(app);
 
 //console.log('VCAP_APPLICATION');
 //console.dir(process.env.VCAP_APPLICATION);
@@ -67,11 +74,26 @@ res.end('done');
 //var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
 //var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
 
+//start for SSL
+//var fs = require('fs');
+//var sslPath = '/Users/skipper/letsencrypt/live/blogwoods.net/';
+//var options = {  
+//    key: fs.readFileSync(sslPath + 'privkey.pem'),
+//    cert: fs.readFileSync(sslPath + 'fullchain.pem')
+//};
+//var https = require('https');
+//https.createServer(options, app).listen(appEnv.port, '0.0.0.0', function() {
+//	console.log('server starting on ', appEnv.url);
+//});
+// end for SSL
+
+
 // start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
-  // print a message when the server starts listening
   console.log("server starting on " + appEnv.url);
 });
 // appid 3b7bc12c-da5d-46d3-a7e1-51c7e8b6295d
 // app secret nsn6tep1ixsp3ss681c2huol2ryvkyaa
 
+//blogwoods: e96f9c9e-5259-4e7e-ba89-5b569e645490
+// secret: 1a0sb5w9fc8spj6v835qs6b8cmupklmu

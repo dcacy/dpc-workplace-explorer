@@ -1,0 +1,68 @@
+<html>
+	<head>
+	<title>DPC Workspace Explorer</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/carbon-components.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="css/styles.css"></link>
+	</head>
+	<body>
+		<div style="color:red;" id="error"></div>
+		<div id="loginMessage" style="display:none;">Would you like to <a href="/">start over</a>?</div>
+	
+		<div class="bx--interior-left-nav__header" id="navBar" style="display:none;">
+    		<a tabindex="0" data-inline-left-nav-previous-page href="#" onclick="start();return false;" class="bx--interior-left-nav__header--link">
+	      	<svg class="bx--interior-left-nav__icon">
+	        		<use xlink:href="/img/sprite.svg#common--previous"></use>
+	      	</svg>
+	      	Back to <span data-inline-left-nav-previous-page-title class="previous-page">List of Spaces</span>
+    		</a>
+  		</div>
+  
+		<div id="spaces"></div>	
+		<div id="spacesWrapper">
+			<table id="spaceInfo" style="display:none;">
+				<tr>
+					<td class="spaceInfoLabel">Name:</td><td><span id="spaceName"></span></td>
+				</tr>
+				<tr>
+					<td class="spaceInfoLabel">Nbr of Members:</td><td><span id="membersCount"></span></td>
+				</tr>
+				<tr>
+					<td class="spaceInfoLabel">Nbr of Apps:</td><td><span id="appsCount"></span></td>
+				</tr>
+			</table>
+			<div id="messagesTableHeader" class="tableHeader" style="display:none;">Messages</div>
+			<div id="messages" style="width:70%;"></div>
+			</div>    
+			<table id="spaceInfoTable" style="max-width:150px;" class="table compact stripe"></table> 
+			<div style="float:left;" id="spacesTableWrapper">
+				<div id="spacesTableHeader" style="width:100%" class="tableHeader">Spaces:</div>
+				<table class="table compact stripe hover" id="spacesTable">
+				</table>
+		   </div>
+		   <div>
+		   	<div style="float:left;width:50%;">
+					<table id="messagesTableDataTable" style="width:100%;" class="table compact stripe hover" >
+					</table>
+					<div id="PrevNext" class="PrevNext" style="float:right;">
+						<img onclick="previousMessages()" id="PreviousButton" src="/img/arrow--left.svg" style="display:none;padding-right:10px;">
+						<img onclick="nextMessages()" id="NextButton" src="/img/arrow--right.svg" style="display:none;">
+					</div>
+				</div>
+				<div style="float:right;width:49%;background-color:#ccddee;" id="messageWrapper">	   
+				</div>
+			</div>
+		</div>
+		
+	
+		<script type="text/javascript" src="js/carbon-components.min.js"></script>
+		<script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script type="text/javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="js/jquery.tinydot.min.js"></script>
+		<script type="text/javascript" src="js/jquery.loadmask.min.js"></script>
+		<script type="text/javascript" src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/spaces.js"></script>
+	</body>
+</html>
