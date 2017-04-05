@@ -9,23 +9,23 @@ function start() {
 //	$('#messagesTableHeader').hide();
 //	$('#PrevNext').hide();
 //	$('#spacesTableWrapper').show();
-  $('#spacesTable').mask('<div align="center">Please Wait...<br/><img src="/img/watson.gif"></div>',200);
-
+  
   if ( spaceData ) {
   	console.log('found spaceData so just showing spaces');
   	$('#spacesTableWrapper').show();
   	$('#spaceWrapper').hide();
   } else {
   	console.log('did not find space data so calling API');
-	$.get("/getSpaces", formatSpacesTable, 'json')
-	.fail(function(err) {
-		console.log('an error occurred getting spaces:', err);
-		$('#error').html(err.responseText);
-		$('#loginMessage').show();
-	}).
-	always(function() {
-		$('#spacesTable').unmask();
-	});
+  	$('#spacesTable').mask('<div align="center">Please Wait...<br/><img src="/img/watson.gif"></div>',200);
+  	$.get("/getSpaces", formatSpacesTable, 'json')
+		.fail(function(err) {
+			console.log('an error occurred getting spaces:', err);
+			$('#error').html(err.responseText);
+			$('#loginMessage').show();
+		}).
+		always(function() {
+			$('#spacesTable').unmask();
+		});
   }
 
 }
