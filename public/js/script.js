@@ -2,7 +2,7 @@
 
 function loginAndGetSpaces() {
 	console.log('in loginAndGetSpaces');
-	$.get("/oauth", formatSpacesTable2, 'json')
+	$.get("/login", formatSpacesTable2, 'json')
 	.fail(function(err) {
 		console.log('an error occurred:', err);
 		$('#spaces').html(err);

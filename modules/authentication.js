@@ -10,6 +10,10 @@ module.exports = function(app) {
 var Promise = require('promise');
 var request = require('request');
 var rp = require('request-promise');
+var db = require('./db');
+//console.log('db is');
+//console.log(db);
+
 //var session = require('client-sessions');
 
 
@@ -17,7 +21,7 @@ const WWS_URL = "https://api.watsonwork.ibm.com";
 const WWS_CLIENT_URL = "https://workspace.ibm.com";
 const AUTHORIZATION_API = "/oauth/token";
 const OAUTH_ENDPOINT = "/oauth/authorize";
-const SPACE_URI = "/space/";
+//const SPACE_URI = "/space/";
 const sixtydays = 1000 * 60 * 60 * 24 * 60;
 const onehour = 1000 * 60 * 60;
 const APP_ID = process.env.WORKSPACE_APP_ID;
@@ -36,24 +40,62 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 ////  activeDuration: 5 * 60 * 1000
 //}));
 	
-	app.get('/oauth', function(req,res) {
+	app.get('/login', function(req,res) {
+		var redirectURL = WWS_CLIENT_URL
+		+ OAUTH_ENDPOINT 
+		+ "?response_type=code&client_id=" 
+		+ APP_ID 
+		+ "&redirect_uri=" 
+		+ APP_HOSTNAME 
+		+ "/oauthback&state=" 
+		+ req.session.id;
+//	console.log('redirectURL:', redirectURL);
+//  res.end('{"redirect": "' + redirectURL + '"}');
 //  	console.log('in oauth and session  is ', req.session);
-  	console.log('appid is ', APP_ID,' and hostname is', APP_HOSTNAME);
-  	console.log('mock is ', process.env.MOCK);
-  	if ( process.env.MOCK && process.env.MOCK == 'true' ) {
-  		res.end(process.env.MOCK_SPACES);
-  	} else {
-	  	var redirectURL = WWS_CLIENT_URL
-				+ OAUTH_ENDPOINT 
-				+ "?response_type=code&client_id=" 
-				+ APP_ID 
-				+ "&redirect_uri=" 
-				+ APP_HOSTNAME 
-				+ "/oauthback&state=" 
-				+ req.session.id;
-//	  	console.log('redirectURL:', redirectURL);
-	    res.end('{"redirect": "' + redirectURL + '"}');
-  	}
+		if ( req.cookies ) {
+			console.log('found cookies');
+			if ( req.cookies.dpcWorkspaceExplorer ) {
+				console.log('found my cookie and it is', req.cookies.dpcWorkspaceExplorer);
+				db.getRefreshToken(req.cookies.dpcWorkspaceExplorer)
+				.then(function(results){
+//					console.log('results of getting Refresh Token is:');
+//					console.dir(results);
+//					console.log('the token is', results.refreshToken);
+					getAuthTokenFromRefreshToken(results.refreshToken)
+					.then(function(result){
+						console.log('success getting auth token from refresh token...redirecting');
+						console.log(result);
+		        req.session.accessToken = result.access_token;
+						res.redirect('/spaces.html');
+					})
+					.catch(function(err){
+						console.log('error getting auth token from refresh token');
+				    res.end('{"redirect": "' + redirectURL + '"}');
+					});
+				})
+				.catch(function(err){
+					console.log('error getting refresh token');
+				})
+				
+			} else {
+				console.log('did not find my cookie');
+		    res.redirect(redirectURL);
+
+			}
+		} else {
+			console.log('no cookies');
+	    res.redirect(redirectURL);
+
+		}
+//    console.log('cookie:', req.cookies.dpc-workspace-explorer);//", userid, {maxAge: sixtydays});
+
+//  	console.log('appid is ', APP_ID,' and hostname is', APP_HOSTNAME);
+//  	console.log('mock is ', process.env.MOCK);
+//  	if ( process.env.MOCK && process.env.MOCK == 'true' ) {
+//  		res.end(process.env.MOCK_SPACES);
+//  	} else {
+//	  	
+//  	}
   	
   });
 	
@@ -90,6 +132,9 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 //        console.dir(req.session);
         // set userid in cookie
 //        setRememberMeCookie(res, userid);
+        res.cookie("dpcWorkspaceExplorer", userid, {maxAge: sixtydays});
+//        console.log('db:', db);
+        db.storeUserInfo({userid:userid,userName:userName,refreshToken:refreshToken});
 
         // Save the Refreshtoken for reuse
 //        var versetospace = cloudant.db.use("versetospace");
@@ -184,6 +229,7 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 	
 	app.get('/getSpaces', function(req,res) {
 		console.log('in getSpaces');
+		console.dir(req.session);
 		var token = req.session.accessToken;
 //		token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiaWQiOiIzYjdiYzEyYy1kYTVkLTQ2ZDMtYTdlMS01MWM3ZThiNjI5NWQiLCJleHAiOjE0OTEyOTUwNDksImp0aSI6Ijk2M2Y0MjljLTkyZDItNGI0Ni04MjEwLWMxNTg5ZDExOWUzYiIsImNsaWVudF9pZCI6IjNiN2JjMTJjLWRhNWQtNDZkMy1hN2UxLTUxYzdlOGI2Mjk1ZCJ9.LBR93rVsWKLHbgPUWvP5nM0Cra5dW50p-g2fW1eUzD-hrvhRquS5YuE_1lnDTjl2XALhpyB0G9w4l9javgRI5qQnpB9ior97iPPvK6aghkyPqgTrQCzFUs_6DmpsMOUg7takrzNFilq6RWWTt3leHJyE5vG-vBvAlYTaU5NFfMsqrJX31aMKqLYrRNFaYQ_3HnH0Adga0n7tP2t5mJU6zm9Zk0NQ5ZswJjev3ibYhxRz3YV6xMptxNtOtlLS5BOoyIllgBW3aIswI9ddRkVpOSRZmBJIkJN3mVXyH2jYlPo8yUY-JcFld1Unummlb-JZbZ0pS_fD4ASzyixEWEhc3w";
 //	  console.log('token: <' + token + '> and type is ' + typeof token);
@@ -272,66 +318,36 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 		});
 	}
 	
-	
-	function getSpaces() {
-		console.log('in method getSpaces');
-		return new Promise(function(resolve, reject){
-			getToken().then(function(result) {
-				console.log('token: ', result);
-				var token = JSON.parse(result);
-				var access_token = token.access_token;
-				console.log('getting Spaces');
-				var options = {
-				    method: 'POST',
-				    uri: 'https://api.watsonwork.ibm.com/graphql',
-				    headers: {
-				    	'Content-Type':'application/json',
-				    	'jwt': token.access_token
-				    },
-				    body: {
-				        query: 'query getSpaces { spaces(first: 5) {items {title id }}}'
-				    },
-				    json: true // Automatically stringifies the body to JSON
-				};
-				rp(options)
-		    .then(function (parsedBody) {
-		        console.log('graphql worked and result is ', parsedBody);
-		        resolve(parsedBody);
-		    })
-		    .catch(function (err) {
-		        console.log('graphql failed');
-		        reject(err);
-		    });
-			},
-			function(err){
-			console.log('error: ', err.statusCode, err.message);			
-			reject(err);
-			});			
+	function getAuthTokenFromRefreshToken(refreshToken) {
+    console.log("Issuing Authentication request with grant type 'refresh_token'");
+    console.log('refreshToken is', refreshToken);
+		return new Promise(function(resolve, reject) {
+			
+			var options = {
+			    method: 'POST',
+			    uri: `${WWS_URL}${AUTHORIZATION_API}`,
+			    "auth": {
+            "user": APP_ID,
+            "pass": APP_SECRET
+			    },
+	        "form": {
+	          "grant_type": "refresh_token",
+	          "refresh_token": refreshToken
+	        },
+				  json: true // Automatically parses the body to JSON
+			};
+			rp(options)
+	    .then(function (parsedBody) {
+	        console.log('got auth token from refresh token', parsedBody);
+//	        console.dir(parsedBody.data.spaces.items);
+	        resolve(parsedBody);
+	    })
+	    .catch(function (err) {
+	        console.log('failed to get auth token from refresh token',err);
+	        reject(err);
+	    });
 		});
+    }
 
-
-		}
-	
-  app.get('/getToken', function(req,res) {
-  	console.log('in getToken');
-  	getSpaces().then(function(result) {
-  		console.log('in getSpaces.then');
-  	  var json = result;//JSON.parse(result);
-  	  var expires_in = json.expires_in;
-  	  console.log('expires: ', json.expires_in);
-  	  console.log('session is', req.session);
-  	  req.session.expires_in = 'howdy';
-  		console.log('called getToken and result is ', json);
-      res.setHeader('Content-Type','application/json');
-//      var cookies = new Cookies(req, res);
-//      cookies.set('expires_in', json.expires_in, { httpOnly: false });
-  		res.end(JSON.stringify(result.data.spaces.items));
-  	},
-  	function(err){
-  		console.log('error!', err.statusCode, err.message);
-      res.setHeader('Content-Type','application/json');
-  		res.end(JSON.stringify(err.message));
-  	});
-  });
 
 }

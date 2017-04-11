@@ -28,6 +28,7 @@ function start() {
 			$('#error').html(err.responseText);
 			$('#loginMessage').show();
 			$('#spacesTableWrapper').hide();
+			$('#navBar').hide();
 		}).
 		always(function() {
 			$('#spacesTable').unmask();
@@ -97,13 +98,23 @@ function formatSpacesTable(data) {
   		console.log('an error occurred:', err);
   		$('#error').html(err.responseText);
   	}).
-  	always(function(){
+  	always(function(json){
+//  		console.log('in always and json is', json);
  		  $('#pleaseWait').unmask();
  		  $('#navBar').show();
  		  $('#spaceInfoTable').show();
  		  $('#messagesTableHeader').show();
-//		  $('#PreviousButton').show();
- 		  $('#NextButton').show();
+//		  $('#NextButton').show();
+ 		  if ( json.conversation.messages.pageInfo.hasNextPage === true ) {
+ 	 		  $('#NextButton').show(); 		  	
+ 		  } else {
+ 	 		  $('#NextButton').hide();
+ 		  }
+ 		  if ( json.conversation.messages.pageInfo.hasPreviousPage === true ) {
+ 	 		  $('#PreviousButton').show(); 		  	
+ 		  } else {
+ 	 		  $('#PreviousButton').hide();
+ 		  }
   	});
 	});
 	}
@@ -112,7 +123,7 @@ function formatSpacesTable(data) {
 
 
 function processSpaceDetails(json) {
-//	console.log('this is', json);
+	console.log('this is', json);
 	var apps = $.grep(json.members.items, function( item, i ) {
 //		console.log(item);
 	  return ( item.email == null );
@@ -130,7 +141,7 @@ function processSpaceDetails(json) {
 	}
 	var messagesTable = $('#messagesTableDataTable').DataTable( {
     data: json.conversation.messages.items,
-//    paging: false,
+    paging: false,
     searching: false,
     info: false,
 //    responsive: true,
@@ -210,7 +221,7 @@ function processSpaceDetails(json) {
 			$('#messageWrapper').unmask();
 		});
 	});
-
+}
 	function processMessageDetails(json) {
 //		console.log('in processMessageDetails and json is ', json);
 //		var annotation = JSON.parse(json.annotations[0]);
@@ -321,7 +332,7 @@ function processSpaceDetails(json) {
 	
 	
 //	$('#messagesCount').html(json.conversation.messages.items.length);
-}
+
 
 function syntaxHighlight(json) {
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -350,6 +361,41 @@ function nextMessages() {
  * {"title":"ICTS Tech Sales ðŸ‘","id":"57ae304de4b0d0e21a2dead8"},
  * {"title":"ðŸ“ Watson Minutes Project","id":"588668dee4b01624a621e562"},{"title":"ðŸ‘¨â€ðŸ’»NA ICS Ninjas","id":"57c9cc91e4b0330271ec0367"},{"title":"6854c42b-53f7-4ded-b6f6-8fdd358dbf50","id":"58aba7fbe4b0a2958289e4f2"},{"title":"Watson Workspace Integration","id":"57bc6300e4b0f6d73bc84640"},{"title":"ICS Builder Garage","id":"58488ef1e4b0429cc6d16120"},{"title":"dc8b88aa-a947-4c8f-bcf9-84c725bc57d6","id":"58a9e04ce4b0159c3438c40b"},{"title":"-","id":"58bed412e4b0ee11fcfc6c62"},{"title":"-","id":"58c8146fe4b0e1cbaf943445"},{"title":"1992f865-2975-4ba2-9f8d-7dcf7c616b6c","id":"58ce88fae4b014d4036e51a6"},{"title":"ðŸ‘ðŸ¼ Natural Theology","id":"58d11d8ee4b08542c86ef119"},{"title":"Darren's place where he works","id":"57d6cb0ae4b003653731a2f3"},{"title":"2536e778-0d4e-47b7-b286-c4b10be58e04","id":"58ac989be4b00c0b05b9769f"},{"title":"4885c287-19e5-44df-a048-398d15f94b2c","id":"58d02e8ae4b014d4036ebb21"},{"title":"NA Tech Sellers","id":"58c19747e4b08d8f7457c2e1"},{"title":"195ad890-0144-4d98-b34a-6ebf9bd570ef","id":"58a78022e4b003edf6097132"},{"title":"-","id":"58c964b0e4b0b552cfc3e9a5"},{"title":"-","id":"58c955c2e4b0b0d4b08c8294"},{"title":"01320efd-365d-4a7f-9ef1-94b1e3cd4a0e","id":"58ac987be4b0cdea294eea9c"}]
  */
+function pageThroughMessages(direction) {
+	console.log('click and direction is', direction.id);
+	var whichDirection = direction.id === 'NextButton' ? 'next' : 'previous'; 
+	$('#messagesTableWrapper').hide();
+  $('#pleaseWait').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
+  $.get("/page", { direction : whichDirection}, processSpaceDetails, 'json')
+  .fail(function(err) {
+		console.log('an error occurred:', err);
+		$('#error').html(err.responseText);
+	}).
+	always(function(json){
+		  if ( json.conversation.messages.pageInfo.hasNextPage === true ) {
+ 	 		  $('#NextButton').show(); 		  	
+ 		  } else {
+ 	 		  $('#NextButton').hide();
+ 		  }
+ 		  if ( json.conversation.messages.pageInfo.hasPreviousPage === true ) {
+ 	 		  $('#PreviousButton').show(); 		  	
+ 		  } else {
+ 	 		  $('#PreviousButton').hide();
+ 		  }
+ 			$('#messageWrapper').hide();
+ 	    $('#pleaseWait').unmask();
+ 	    $('#messagesTableWrapper').show();
+
+//		  $('#pleaseWait').unmask();
+//		  $('#navBar').show();
+//		  $('#spaceInfoTable').show();
+//		  $('#messagesTableHeader').show();
+////	  $('#NextButton').show();
+//		  $('#NextButton').show();
+	});
+
+	
+}
 
 $(document).ready(function(){
 

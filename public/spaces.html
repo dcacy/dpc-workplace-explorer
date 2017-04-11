@@ -21,59 +21,52 @@
   		<!-- error message display -->
 		<div style="color:red;" id="error"></div>
 		<div id="loginMessage" style="display:none;">Would you like to <a href="/">start over</a>?</div>
-
-		<!-- <div id="spaces"></div>-->	
-		<!-- <div id="spacesWrapper">-->
-			<!-- <div id="messages" style="width:70%;"></div>-->
-		<!-- </div>-->    
-			<!-- <table id="spaceInfoTable" style="max-width:150px;" class="table compact stripe"></table>-->
-			 
+		 
 		<div id="appWrapper">
-		<!-- list of spaces -->
-		<div style="float:left;" id="spacesTableWrapper">
-			<div id="spacesTableHeader" class="tableHeader">Spaces:</div>
-			<table class="table compact stripe hover" id="spacesTable"></table>
-	   </div>
-	   
-	   <!-- info about the selected space -->
-	   <div id="spaceWrapper">
-		<table id="spaceInfoTable" style="display:none;">
-			<tr>
-				<td class="spaceInfoLabel">Name:</td><td><span id="spaceName"></span></td>
-			</tr>
-			<tr>
-				<td class="spaceInfoLabel">Nbr of Members:</td><td><span id="membersCount"></span></td>
-			</tr>
-			<tr>
-				<td class="spaceInfoLabel">Nbr of Apps:</td><td><span id="appsCount"></span></td>
-			</tr>
-		</table>
-		   <!--  the messages for a space go here -->
-	   <div>
-	   	<div style="float:left;width:50%;">
-			<div id="messagesTableHeader" class="tableHeader" style="display:none;">Messages</div>
-				<div id="pleaseWait"></div>
-				<div id="messagesTableWrapper">
-				<table id="messagesTableDataTable" style="width:100%;" class="table compact stripe hover" >
+			<!-- list of spaces -->
+			<div style="float:left;" id="spacesTableWrapper">
+				<div id="spacesTableHeader" class="tableHeader">Spaces:</div>
+				<table class="table compact stripe hover" id="spacesTable"></table>
+		   </div>
+		   
+		   <!-- info about the selected space -->
+		   <div id="spaceWrapper">
+				<table id="spaceInfoTable" style="display:none;">
+					<tr>
+						<td class="spaceInfoLabel">Name:</td><td><span id="spaceName"></span></td>
+					</tr>
+					<tr>
+						<td class="spaceInfoLabel">Nbr of Members:</td><td><span id="membersCount"></span></td>
+					</tr>
+					<tr>
+						<td class="spaceInfoLabel">Nbr of Apps:</td><td><span id="appsCount"></span></td>
+					</tr>
 				</table>
-				</div>
-				<div id="PrevNext" class="PrevNext" style="float:right;">
-					<img onclick="previousMessages()" id="PreviousButton" src="/img/arrow--left.svg" style="display:none;padding-right:10px;">
-					<img onclick="nextMessages()" id="NextButton" src="/img/arrow--right.svg" style="display:none;">
+			   <!--  the messages for a space go here -->
+			   <div>
+			   	<div style="float:left;width:50%;">
+						<div id="messagesTableHeader" class="tableHeader" style="display:none;">Messages</div>
+						<div id="pleaseWait"></div>
+						<div id="messagesTableWrapper">
+							<div id="PrevNext" class="PrevNext" style="float:right;">
+								<img onclick="pageThroughMessages(this);" id="PreviousButton" src="/img/arrow--left.svg" style="display:none;padding-right:10px;">
+								<img onclick="pageThroughMessages(this);" id="NextButton" src="/img/arrow--right.svg" style="display:none;">
+							</div>
+							<table id="messagesTableDataTable" style="width:100%;" class="table compact stripe hover" >
+							</table>
+						</div>
+					</div>
+					
+					<!-- annotations for the selected message -->
+					<div style="float:right;width:49%;" id="messageWrapper">
+						<div>Sentiment: <span id="sentiment"></span></div>
+						<div>Keywords: <span id="keywords"></span></div>
+						<div id="annotations"></div>
+					</div>
 				</div>
 			</div>
-			
-			<!-- annotations for the selected message -->
-			<div style="float:right;width:49%;" id="messageWrapper">
-				<div>Sentiment: <span id="sentiment"></span></div>
-				<div>Keywords: <span id="keywords"></span></div>
-				<div id="annotations"></div>
-			</div>
-		</div>
-		</div>
 		</div>
 		
-	
 		<script type="text/javascript" src="js/carbon-components.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js"></script>
 		<script type="text/javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>

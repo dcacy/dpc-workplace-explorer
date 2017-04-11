@@ -4,6 +4,8 @@ var express = require('express'),
   cfenv = require('cfenv');
 //var session = require('client-sessions');
 var session = require('express-session');
+var cookieParser = require("cookie-parser");
+
 
 // create a new express server
 var app = express();
@@ -36,6 +38,8 @@ app.use(session({
       maxAge: 1000 * 60 * 60
   }
 }));
+
+app.use(cookieParser());
 //app.use(session({
 //  cookieName: 'session',
 //  secret: 'here-is-a-secret',
@@ -45,14 +49,15 @@ app.use(session({
 
 //var https = require('https');
 var authentication = require('./modules/authentication');
-var cloudant = require('./modules/cloudant');
+var db = require('./modules/db');
 var space = require('./modules/space');
 var message = require('./modules/message');
 
 authentication(app);
-//cloudant(app);
 space(app);
 message(app);
+//db();
+//db.checkDB('workspace_explorer');
 
 //console.log('VCAP_APPLICATION');
 //console.dir(process.env.VCAP_APPLICATION);

@@ -59,7 +59,8 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 	  	res.status(400);
 	  	res.end('{"error":"You must provide a Space ID."}');
 	  } else {
-		  getSpaceInfo(token, spaceID)
+	  	req.session.spaceID = spaceID;
+		  getSpaceInfo(token, spaceID, undefined, 'first')
 		  .then(function(result){
 //		  	console.dir(result.conversation.messages);
 //		  	console.log('start:',result.conversation.messages.pageInfo.startCursor);
@@ -80,9 +81,17 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
   	
   });
 	
-	function getSpaceInfo(token, spaceID) {
+	function getSpaceInfo(token, spaceID, cursor, direction) {
 
-		console.log('in method getSpaceInfo');
+		console.log('in method getSpaceInfo and cursor is', cursor, ' and direction is', direction);
+		var cursorString = '';//typeof cursor === 'undefined' ? '' : ', before: "' + cursor + '"';
+		if ( typeof cursor !== 'undefined' ) {
+			var whichDirection = direction === 'first' ? 'after' : 'before';
+				
+			
+			cursorString = ', ' + whichDirection + ': "' + cursor + '"';
+		}
+		console.log('cursorString is', cursorString);
 //		var query = 'query getSpace { space(id: "' + spaceID + '") { title description membersUpdated members { items { email displayName } } conversation{ messages{ items { content } } } }}}';
 		var query = 'query getSpace {'
 		  + 'space(id: "' + spaceID + '") {'
@@ -96,7 +105,9 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 		  + '    }'
 		  + '  }'
 		  + '  conversation {'
-		  + '    messages(first: 200) {'
+		  + '    messages(' + direction + ': 10'
+		  +     cursorString
+		  + ') {'
 		  + '      pageInfo {'
 		  + '        startCursor'
 		  + '        endCursor'
@@ -119,6 +130,7 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 		  + ' }'
 		  + '}'
 		  ;
+		console.log('query is', query);
 		return new Promise(function(resolve, reject){
 //			getToken().then(function(result) {
 //				console.log('token: ', result);
@@ -160,6 +172,35 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 
 	
 	}
+	
+	app.get('/page', function(req,res) {
+	  var qs = url.parse(req.url,true).query;
+	  var direction = qs.direction;
+	  var cursor = direction === 'previous' ? req.session.startCursor : req.session.endCursor;
+	  var whichDirection = direction === 'previous' ? 'last ': 'first' ;
+	  console.log('cursor is', cursor,' and direction is', whichDirection);
+	  var spaceID = req.session.spaceID;
+	  console.log('direction is ', direction, 'and spaceID is', spaceID);
+	  getSpaceInfo(req.session.accessToken, req.session.spaceID, cursor, whichDirection)
+	  .then(function(result){
+	  	console.log('got result from page');
+	  	console.log('result is', result);
+//	  	console.dir(result.conversation.messages);
+//	  	console.log('start:',result.conversation.messages.pageInfo.startCursor);
+//	  	console.dir(req.session);
+	  	req.session.startCursor = result.conversation.messages.pageInfo.startCursor;
+	  	req.session.endCursor = result.conversation.messages.pageInfo.endCursor;
+//	  	console.dir(req.session);
+	  	res.end(JSON.stringify(result));
+	  })
+	  .catch(function(err) {
+	  	console.log(err.status, err.message);
+	  	res.status(500);
+	  	res.end('{"error":"status = ' + err.status + ', message = ' + err.message);
+	  });
+//	  res.end('{return:"done"}');
+	});
+
 /*
  * 
  */
