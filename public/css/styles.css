@@ -68,16 +68,31 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .messagesTableBody {
 	display: table-row-group;
 }
+.spaceTableName, .theMessage {
+	text-decoration: underline;
+	color: blue;
+}
 
 .spaceTableText {
 	font-family: 'IBM Helvetica', Helvetica Neue, HelveticaNeue, Helvetica, sans-serif;
 	font-size: 14px;
 }
 .spaceTableName:hover,
-.messageContent:hover {
-	color: blue;
-	text-decoration: underline;
+.messageContent:hover,
+.theMessage:hover {
+	color: white;
+	background-color: #ccddee;
+	//text-decoration: underline;
 	cursor: pointer;
+}
+.spaceTableName.sorting,
+.spaceTableName.sorting_asc,
+.spaceTableName.sorting_desc,
+.theMessage.sorting,
+.theMessage.sorting_asc,
+.theMessage.sorting_desc {
+	text-decoration: none;
+	color: #000;
 }
 
 #spacesTableWrapper {

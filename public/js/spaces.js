@@ -178,7 +178,8 @@ function processSpaceDetails(json) {
         { "data": "created"}
     ],
     columnDefs: [
-    	{ "className" : "messageContent", "targets": "_all"},
+    	//{ "className" : "messageContent", "targets": "_all"},
+    	{ "className" : "theMessage", "targets": 0},
       { "title": "Message", "targets": 0 },
       { "title": "Author", "targets": 1 },
       { "title": "When Created", "targets": 2, render: function(data, type) {
