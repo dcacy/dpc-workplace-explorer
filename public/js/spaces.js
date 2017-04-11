@@ -91,7 +91,7 @@ function formatSpacesTable(data) {
 //    $('#spacesTableWrapper').innerHTML = '';//html();
     
     $('#spacesTableWrapper').hide();
-    $('#spaceWrapper').show();
+    $('#spaceWrapper').hide();
     $('#pleaseWait').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
     $.get('/getSpaceDetails', { id : row.data().id}, processSpaceDetails, 'json')
     .fail(function(err) {
@@ -101,6 +101,7 @@ function formatSpacesTable(data) {
   	always(function(json){
 //  		console.log('in always and json is', json);
  		  $('#pleaseWait').unmask();
+ 		  $('#spaceWrapper').show();
  		  $('#navBar').show();
  		  $('#spaceInfoTable').show();
  		  $('#messagesTableHeader').show();

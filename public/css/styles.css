@@ -2,7 +2,14 @@ body, table {
 	font-family: 'IBM Helvetica', Helvetica Neue, HelveticaNeue, Helvetica, sans-serif;
 	font-size: 0.875rem;
 }
-
+.intro {
+	background-color: #D3D3D3;
+	padding: 20px;
+}
+.intro_header {
+	font-size: 20px;
+	margin-bottom: 10px;
+}
 .spacesTitle{
 	font-size: 1rem;
 	text-transform: uppercase;
