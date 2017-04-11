@@ -70,7 +70,8 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 					})
 					.catch(function(err){
 						console.log('error getting auth token from refresh token');
-				    res.end('{"redirect": "' + redirectURL + '"}');
+						res.clearCookie('dpcWorkspaceExplorer');
+				    res.redirect('/login');
 					});
 				})
 				.catch(function(err){
