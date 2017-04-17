@@ -1,19 +1,5 @@
-//function() {
-	
-	
-
-//var exports = {};
 "use strict";
-// --------------------------------------------------------------------------
-// Require statements
-// --------------------------------------------------------------------------
-//var express = require("express");
-//var request = require("request");
-//var session = require('express-session');
-//var bodyParser = require("body-parser");
-//var cookieParser = require("cookie-parser");
-//var createTextVersion = require("textversionjs");
-//var requestjs = require("request-json");
+
 var Cloudant = require("cloudant");
 var Promise = require('promise');
 
@@ -71,7 +57,7 @@ var dbname = 'workspace_explorer';
 exports.checkDB = function(dbname) {
  cloudantdb = getOrCreateDB(dbname)
 	.then(function(db) {
-		console.log('got database');
+		console.log('found database');
 		cloudantdb = db;
 //		return db;
 	})
@@ -87,14 +73,14 @@ exports.checkDB(dbname);
 
 exports.storeUserInfo = function(info){
 	console.log('in storeUserInfo and info is', info);
-	console.log('first check to see if record exists');
-	console.log('dbname is', dbname);
+//	console.log('first check to see if record exists');
+//	console.log('dbname is', dbname);
 //	console.log('and db is', cloudantdb);
 //	var cloudantdb = cloudant.db.use(dbname);
 	cloudantdb.get(info.userid)
 	.then(function(results) {
-		console.log('result of check is', results);
-		console.log('updating record');
+//		console.log('result of check is', results);
+//		console.log('updating record');
 		var doc = {
 				'_id' : info.userid,
 				'_rev': results._rev,
@@ -103,7 +89,7 @@ exports.storeUserInfo = function(info){
 		}
 		cloudantdb.insert(doc, doc._id)
 		.then(function(result){
-			console.log('result of update', result);
+//			console.log('result of update', result);
 		})
 		.catch(function(err){
 			console.log('error on update', err);
@@ -133,12 +119,12 @@ exports.storeUserInfo = function(info){
 
 exports.getRefreshToken = function(userid) {
 	
-	console.log('looking up user in db');
+//	console.log('looking up user in db');
 
 	return new Promise(function(resolve, reject) {
 	cloudantdb.get(userid)
 		.then(function(results) {
-			console.log('found user:', results);
+//			console.log('found user:', results);
 			resolve(results);
 		})
 		.catch(function(err){
@@ -173,7 +159,7 @@ function getOrCreateDB(dbname) {
 				reject(err);
 			});
 		} else {
-			console.log('found db');
+//			console.log('found db');
 			resolve(cloudant.db.use(dbname));
 		}
 //		return cloudant.db.use(dbname);
