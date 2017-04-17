@@ -54,7 +54,10 @@ app.get('/getSpaces', function(req,res) {
   	res.end('{"error":"Authentication token is not set.}');
   } else {
   	// log this action
-  	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&userID=${req.session.userName}&feature=spaces&datacenter=*&resource=${req.path}`)
+  	var userName = encodeURI(req.session.userName);
+  	var metricsURL = `http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&feature=getSpaces&datacenter=*&resource=${req.path}&userId=${userName}`;
+  	console.log('metricsURL is', metricsURL);
+  	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&feature=getSpaces&datacenter=*&resource=${req.path}&userId=${userName}`)
   	.then() // we don't care about the result
   	.catch(function(err){
   		console.log('logging failed', err);
@@ -131,7 +134,8 @@ function getSpaces(token) {
 	  	res.end('{"error":"You must provide a Space ID."}');
 	  } else {
 	  	req.session.spaceID = spaceID;
-	  	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&userID=${req.session.userName}&feature=getSpaceDetails&datacenter=*&resource=${req.path}`)
+	  	var userName = encodeURI(req.session.userName);
+	  	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&feature=getSpaceDetails&datacenter=*&resource=${req.path}&userId=${userName}`)
 	  	.then() // no-op
 	  	.catch(function(err){
 	  		console.log('error logging getSpaceDetails',err);

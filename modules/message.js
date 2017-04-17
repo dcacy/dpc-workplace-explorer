@@ -60,8 +60,8 @@ var APP_HOSTNAME = 'https://' + vcap_application.application_uris[0];
 	  	res.status(400);
 	  	res.end('{"error":"You must provide a Message ID."}');
 	  } else {
-//	  	console.log('username is in getMessageDetails:',req.session.userName);
-	  	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&userID=${req.session.userName}&feature=messageDetails&datacenter=*&resource=${req.path}`)
+	  	var userName = encodeURI(req.session.userName);
+	  	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&userId=${userName}&feature=getMessageDetails&datacenter=*&resource=${req.path}`)
 	  	.then() // we don't care about the result
 	  	.catch(function(err){
 	  		console.log('logging getMessageDetails failed', err);

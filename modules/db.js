@@ -72,7 +72,7 @@ exports.checkDB(dbname);
 //console.log('db is', cloudantdb);
 
 exports.storeUserInfo = function(info){
-	console.log('in storeUserInfo and info is', info);
+//	console.log('in storeUserInfo and info is', info);
 //	console.log('first check to see if record exists');
 //	console.log('dbname is', dbname);
 //	console.log('and db is', cloudantdb);

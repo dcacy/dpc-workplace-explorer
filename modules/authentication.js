@@ -83,8 +83,8 @@ module.exports = function(app) {
 	 * load the WW data.
 	 */
 	app.get("/oauthback", function(req, res) {
-    console.log("-----------------------------");
-    console.log("Starting OAuth Leg 2 sequence");
+//    console.log("-----------------------------");
+//    console.log("Starting OAuth Leg 2 sequence");
     var redirect_uri = APP_HOSTNAME + "/oauthback";
 
     if (req.query.error) {
@@ -95,12 +95,12 @@ module.exports = function(app) {
 
     var code = req.query.code;
     var state = req.query.state;
-    console.log("Receiving code %s and state %s", code, state);
+//    console.log("Receiving code %s and state %s", code, state);
 
     // Get the accessToken
     getAuthFromOAuthToken(APP_ID, APP_SECRET, code, redirect_uri)
     .then(function(results){
-    	console.log('successful call to getAuthFromOAuthToken');
+//    	console.log('successful call to getAuthFromOAuthToken');
       // Add the accesstoken to the session
       req.session.accessToken = results.access_token;
       // set userid in cookie
@@ -109,7 +109,7 @@ module.exports = function(app) {
       db.storeUserInfo({userid:results.id,userName:results.displayName,refreshToken:results.refresh_token});
 
       console.log("We have an accessToken for %s.", results.displayName);
-      console.log("Redirecting user to spaces.html");
+//      console.log("Redirecting user to spaces.html");
       res.redirect("/spaces.html");
     })
     .catch(function(err){
