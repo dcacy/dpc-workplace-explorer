@@ -55,8 +55,6 @@ app.get('/getSpaces', function(req,res) {
   } else {
   	// log this action
   	var userName = encodeURI(req.session.userName);
-  	var metricsURL = `http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&feature=getSpaces&datacenter=*&resource=${req.path}&userId=${userName}`;
-  	console.log('metricsURL is', metricsURL);
   	rp(`http://ics-metrics.mybluemix.net/logger?author=dcacy@us.ibm.com&app=workspace-explorer&feature=getSpaces&datacenter=*&resource=${req.path}&userId=${userName}`)
   	.then() // we don't care about the result
   	.catch(function(err){
