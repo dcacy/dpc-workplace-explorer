@@ -168,9 +168,9 @@ function processSpaceDetails(json) {
 	
 	//use DataTable's 'on' event handler because the jQuery one doesn't work with paging, or else I did it wrong :-)
 	messagesTable.on('click', 'td', function(){  
-		
+		console.log('clicked');
 		// highlight chosen message
-		$('.messageContent').toggleClass('chosenMessage',false); // un-highlight all msgs
+		$('.theMessage').toggleClass('chosenMessage',false); // un-highlight all msgs
 		$(this).toggleClass('chosenMessage'); // now highlight just this one
 
 		$('#tabs').remove();
