@@ -38,7 +38,8 @@ function formatSpacesTable(data) {
 	} else {
 	// filter out DMs by checking for a hyphen...not the best
 	data = $.grep(data, function( item, i ) {
-	  return ( !item.title.includes('-') );
+		console.log('title is', item.title);
+	  return ( item.title !== '-' );
 	});
 	var table = $('#spacesTable').DataTable( {
     data: data,
