@@ -140,7 +140,9 @@ function processSpaceDetails(json) {
       			}
       		}
       	}
-      	return data;
+      	// convert markdown to HTML, and convert \r \n to <br/>
+      	var converter = new showdown.Converter();
+      	return converter.makeHtml(data).replace(/(?:\r\n|\r|\n)/g, '<br/>');
       }},
       { "data": "createdBy.displayName", "className": "dpcTooltip" },
       { "data": "created"}
@@ -168,7 +170,6 @@ function processSpaceDetails(json) {
 	
 	//use DataTable's 'on' event handler because the jQuery one doesn't work with paging, or else I did it wrong :-)
 	messagesTable.on('click', 'td', function(){  
-		console.log('clicked');
 		// highlight chosen message
 		$('.theMessage').toggleClass('chosenMessage',false); // un-highlight all msgs
 		$(this).toggleClass('chosenMessage'); // now highlight just this one
@@ -197,9 +198,10 @@ function processMessageDetails(json) {
 	var concepts = [];
 	var annotationsBody = '';
 	for (var j = 0; j < json.annotations.length; j++ ) {
-		annotationsHeader += '<li><a href="#tabs-' + (j + 1) + '">Annotation ' + (j + 1) + '</a></li>';
-		annotationsBody += '<div id="tabs-' + (j + 1) + '">';	
+//		annotationsHeader += '<li><a href="#tabs-' + (j + 1) + '">Annotation ' + (j + 1) + '</a></li>';
 		var annotationJSON = JSON.parse(json.annotations[j]);
+		annotationsHeader += '<li><a href="#tabs-' + (j + 1) + '">' + annotationJSON.type + '</a></li>';
+		annotationsBody += '<div id="tabs-' + (j + 1) + '">';	
 		// payload and context are stringified JSON, so convert to JSON
 		if ( annotationJSON.payload ) {
 			var payload = JSON.parse(annotationJSON.payload);

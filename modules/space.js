@@ -256,7 +256,6 @@ function getSpaces(token) {
 	  var direction = qs.direction;
 	  var cursor = direction === 'previous' ? req.session.startCursor : req.session.endCursor;
 	  var whichDirection = direction === 'previous' ? 'last ': 'first' ;
-	  console.log('cursor is', cursor,' and direction is', whichDirection);
 	  var spaceID = req.session.spaceID;
 //	  console.log('direction is ', direction, 'and spaceID is', spaceID);
 	  getSpaceInfo(req.session.accessToken, req.session.spaceID, cursor, whichDirection)
