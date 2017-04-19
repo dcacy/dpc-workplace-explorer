@@ -4,16 +4,13 @@ function start() {
 	// reset UI if necessary
 	$('#messageWrapper').hide();
 	if ( $.fn.dataTable.isDataTable( '#messagesTableDataTable' ) ) {
-		console.log('found messagesTableDataTable, destroying it');
     $('#messagesTableDataTable').DataTable().clear();
 	}
 	// check to see if we have already loaded the spaces
   if ( spaceData ) {
-  	console.log('found spaceData so just showing spaces');
   	$('#spacesTableWrapper').show();
   	$('#spaceWrapper').hide();
   } else {
-  	console.log('did not find space data so calling API');
   	$('#spacesTable').mask('<div align="center">Please Wait...<br/><img src="/img/watson.gif"></div>',200);
   	$.get("/getSpaces", formatSpacesTable, 'json')
 		.fail(function(err) {
@@ -38,7 +35,6 @@ function formatSpacesTable(data) {
 	} else {
 	// filter out DMs by checking for a hyphen...not the best
 	data = $.grep(data, function( item, i ) {
-		console.log('title is', item.title);
 	  return ( item.title !== '-' );
 	});
 	var table = $('#spacesTable').DataTable( {

@@ -75,7 +75,7 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .messagesTableBody {
 	display: table-row-group;
 }
-.spaceTableName, .theMessage {
+.spaceTableName:hover , .theMessage:hover {
 	text-decoration: underline;
 	color: blue;
 }
