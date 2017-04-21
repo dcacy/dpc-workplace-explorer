@@ -33,68 +33,71 @@ function formatSpacesTable(data) {
 	if ( data.redirect ) {
 		window.location.href = data.redirect;
 	} else {
-	// filter out DMs by checking for a hyphen...not the best
-	data = $.grep(data, function( item, i ) {
-	  return ( item.title !== '-' );
+		// filter out DMs by checking for a hyphen (some have just that as the name)
+		// and for the ID (which is what others have)
+		var dmTitlePattern = '[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]';
+		var regex = new RegExp(dmTitlePattern);
+		data = $.grep(data, function( item, i ) {
+			return ( item.title !== '-' && !regex.test(item.title));
 	});
-	var table = $('#spacesTable').DataTable( {
-    data: data,
-    paging: false,
-    searching: false,
-    info: false,
-    autoWidth: false,
-    order: [[ 1, 'desc' ]],
-    columns: [
-    	{ "data": "title", "className": "spaceTableName" },
-      { "data": "updated" }
-    ],
-    columnDefs: [
-    	{ "className" : "spaceTableText", "targets": "_all"},
-      { "title": "Name", "targets": 0 },
-      { "title": "Last Updated", "targets": 1, render: function(data, type) {
-      		// if type is display or filter, then format the date
-      		if ( type === 'display' || type === 'filter') {
-      			return dateFormat(new Date(data), 'dd mmm yyyy h:MM:sstt');
-      		} else {
-      			// otherwise it must be for sorting so return the raw value
-      			return data;
-      		}
-      	}
-      }
-    ]
-  });
-	
-	// do this when user clicks on a space in the spaces table
-	$('#spacesTable tbody').on('click', 'td.spaceTableName', function () {
-    var tr = $(this).closest('tr');
-    var row = table.row( tr );
-    
-    $('#spacesTableWrapper').hide();
-    $('#spaceWrapper').hide();
-    $('#pleaseWait').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
-    $.get('/getSpaceDetails', { id : row.data().id}, processSpaceDetails, 'json')
-    .fail(function(err) {
-  		console.log('an error occurred:', err);
-  		$('#error').html(err.responseText);
-  	}).
-  	always(function(json){
- 		  $('#pleaseWait').unmask();
- 		  $('#spaceWrapper').show();
- 		  $('#navBar').show();
- 		  $('#spaceInfoTable').show();
- 		  $('#messagesTableHeader').show();
- 		  if ( json.conversation.messages.pageInfo.hasNextPage === true ) {
- 	 		  $('#NextButton').show(); 		  	
- 		  } else {
- 	 		  $('#NextButton').hide();
- 		  }
- 		  if ( json.conversation.messages.pageInfo.hasPreviousPage === true ) {
- 	 		  $('#PreviousButton').show(); 		  	
- 		  } else {
- 	 		  $('#PreviousButton').hide();
- 		  }
-  	});
-	});
+		var table = $('#spacesTable').DataTable( {
+	    data: data,
+	    paging: false,
+	    searching: false,
+	    info: false,
+	    autoWidth: false,
+	    order: [[ 1, 'desc' ]],
+	    columns: [
+	    	{ "data": "title", "className": "spaceTableName" },
+	      { "data": "updated" }
+	    ],
+	    columnDefs: [
+	    	{ "className" : "spaceTableText", "targets": "_all"},
+	      { "title": "Name", "targets": 0 },
+	      { "title": "Last Updated", "targets": 1, render: function(data, type) {
+	      		// if type is display or filter, then format the date
+	      		if ( type === 'display' || type === 'filter') {
+	      			return dateFormat(new Date(data), 'dd mmm yyyy h:MM:sstt');
+	      		} else {
+	      			// otherwise it must be for sorting so return the raw value
+	      			return data;
+	      		}
+	      	}
+	      }
+	    ]
+	  });
+		
+		// do this when user clicks on a space in the spaces table
+		$('#spacesTable tbody').on('click', 'td.spaceTableName', function () {
+	    var tr = $(this).closest('tr');
+	    var row = table.row( tr );
+	    
+	    $('#spacesTableWrapper').hide();
+	    $('#spaceWrapper').hide();
+	    $('#pleaseWait').mask('Please Wait...<br/><img src="/img/watson.gif">',200);
+	    $.get('/getSpaceDetails', { id : row.data().id}, processSpaceDetails, 'json')
+	    .fail(function(err) {
+	  		console.log('an error occurred:', err);
+	  		$('#error').html(err.responseText);
+	  	}).
+	  	always(function(json){
+	 		  $('#pleaseWait').unmask();
+	 		  $('#spaceWrapper').show();
+	 		  $('#navBar').show();
+	 		  $('#spaceInfoTable').show();
+	 		  $('#messagesTableHeader').show();
+	 		  if ( json.conversation.messages.pageInfo.hasNextPage === true ) {
+	 	 		  $('#NextButton').show(); 		  	
+	 		  } else {
+	 	 		  $('#NextButton').hide();
+	 		  }
+	 		  if ( json.conversation.messages.pageInfo.hasPreviousPage === true ) {
+	 	 		  $('#PreviousButton').show(); 		  	
+	 		  } else {
+	 	 		  $('#PreviousButton').hide();
+	 		  }
+	  	});
+		});
 	}
 }
 
