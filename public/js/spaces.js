@@ -142,7 +142,12 @@ function processSpaceDetails(json) {
       	}
       	// convert markdown to HTML, and convert \r \n to <br/>
       	var converter = new showdown.Converter();
-      	return converter.makeHtml(data).replace(/(?:\r\n|\r|\n)/g, '<br/>');
+      	var convertedData = converter.makeHtml(data);
+      	if ( convertedData !== null ) {
+      		return converter.makeHtml(data).replace(/(?:\r\n|\r|\n)/g, '<br/>');
+      	} else {
+      		return data;
+      	}
       }},
       { "data": "createdBy.displayName", "className": "dpcTooltip" },
       { "data": "created"}
