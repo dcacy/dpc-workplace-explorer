@@ -5,8 +5,6 @@ var cfenv = require('cfenv');
 var session = require('express-session');
 var cookieParser = require("cookie-parser");
 
-
-// create a new express server
 var app = express();
 
 // serve the files out of ./public as our main files
@@ -15,6 +13,7 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
+// when testing locally, get environment var VCAP_SERVICES from local.env
 require('dotenv').config({silent: true, path: 'local.env'});
 console.log('--------------- getting VCAP_SERVICES -------------');
 var vcap_services = JSON.parse(process.env.VCAP_SERVICES);
@@ -39,17 +38,12 @@ space(app);
 var message = require('./modules/message');
 message(app);
 
+// for testing
 app.get('/clearCookies', function(req,res) {
 	res.clearCookie('dpcWorkspaceExplorer');
-	res.end('done');
-	
-//	});
+	res.end('done');	
 });
-//console.log('vcap:', process.env.VCAP_SERVICES);
 
-//var CLOUDANT_USER = vcap_services.cloudantNoSQLDB[0].credentials.username;
-//var CLOUDANT_PW = vcap_services.cloudantNoSQLDB[0].credentials.password;
-//console.log('local is', process.env.LOCAL);
 if (process.env.LOCAL ) {
 	console.log('running LOCAL');
 //start for SSL

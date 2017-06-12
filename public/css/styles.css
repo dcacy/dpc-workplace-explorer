@@ -2,18 +2,13 @@ body, table {
 	font-family: 'IBM Helvetica', Helvetica Neue, HelveticaNeue, Helvetica, sans-serif;
 	font-size: 0.875rem;
 }
-.intro {
-	background-color: #D3D3D3;
-	padding: 20px;
-}
-.intro_header {
-	font-size: 20px;
-	margin-bottom: 10px;
-}
-.spacesTitle{
+
+p {
 	font-size: 1rem;
-	text-transform: uppercase;
+	line-height: 1.5;
 }
+
+
 .chosenMessage {
 	background-color: #6495ED;
 	color: #fff;
@@ -31,7 +26,7 @@ body, table {
     background-color: #bbddee;
     padding: 5px;
 }
-.bx--interior-left-nav__header {
+.header {
 	width: 50%;
 }
 .PrevNext img:hover {
@@ -42,39 +37,13 @@ body, table {
 pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .string { color: green; }
 .number { color: darkorange; }
-.boolean { color: blue; }
-.null { color: magenta; }
 .key { color: red; }
 
 .messagesTable{
 	display: table;
 	width: 100%;
 }
-.messagesTableRow {
-	display: table-row;
-}
-.messagesTableHeading {
-	background-color: #EEE;
-	display: table-header-group;
-}
-.messagesTableCell, .messagesTableHead {
-	border: 1px solid #999999;
-	display: table-cell;
-	padding: 3px 10px;
-}
-.messagesTableHeading {
-	background-color: #EEE;
-	display: table-header-group;
-	font-weight: bold;
-}
-.messagesTableFoot {
-	background-color: #EEE;
-	display: table-footer-group;
-	font-weight: bold;
-}
-.messagesTableBody {
-	display: table-row-group;
-}
+
 .spaceTableName:hover , .theMessage:hover {
 	text-decoration: underline;
 	color: blue;
@@ -89,7 +58,6 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .theMessage:hover {
 	color: white;
 	background-color: #ccddee;
-	//text-decoration: underline;
 	cursor: pointer;
 }
 .spaceTableName.sorting,
@@ -154,4 +122,76 @@ table.dataTable thead th, table.dataTable tfoot th {
 .table.dataTable {
 	margin: 0;
 }
+
+
+.header {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  border-bottom: 1px solid #dfe3e6;
+  cursor: pointer;
+}
+.header > *,
+.header > *:before,
+.header > *:after {
+  box-sizing: inherit;
+}
+.header--link {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 0.875rem;
+  height: 3.125rem;
+  text-decoration: none;
+  padding: 1.5rem 0 1rem 1.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  font-weight: 600;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: #152935;
+}
+
+.header--link > *,
+.header--link > *:before,
+.header--link > *:after {
+  box-sizing: inherit;
+}
+
+.header--link .header--link--icon {
+  width: 0.9375rem;
+  height: 0.9375rem;
+  margin-right: 1.25rem;
+  fill: #3d70b2;
+}
+
+.header--link:hover {
+  color: #5596e6;
+}
+
+.header--link:hover > .header--link--icon {
+  fill: #5596e6;
+}
+
+.header--link .previous-page {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  margin-left: .3rem;
 }
